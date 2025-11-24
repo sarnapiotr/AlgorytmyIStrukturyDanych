@@ -116,18 +116,24 @@ public:
     }
 
     void deleteByValue(char x) {
-		Element* tempElement = this->head;
-		Element* prevElement = nullptr;
+        Element* tempElement = this->head;
+        Element* prevElement = nullptr;
 
         while (tempElement != nullptr) {
             if (tempElement->getValue() == x) {
-				prevElement->setNext(tempElement->getNext());
-				tempElement = nullptr;
+                if (prevElement == nullptr) {
+                    this->head = tempElement->getNext();
+                }
+                else {
+                    prevElement->setNext(tempElement->getNext());
+                }
+
+                delete tempElement;
+                return;
             }
-            else {
-				tempElement = tempElement->getNext();
-				prevElement = tempElement;
-            }
+
+            prevElement = tempElement;
+            tempElement = tempElement->getNext();
         }
     }
 
@@ -141,7 +147,7 @@ public:
 		}
 
 		prevElement->setNext(nullptr);
-		tempElement = nullptr;
+		delete tempElement;
     }
 
     void insertSorted(char x) {
@@ -234,8 +240,8 @@ public:
         }
         else {
             Node* tempNode = this->root;
-            while (tempNode != nullptr) {
-                if (tempNode->getValue() < x) {
+            while (true) {
+                if (tempNode->getValue() > x) {
                     if (tempNode->getLeft() == nullptr) {
                         tempNode->setLeft(newNode);
                         break;
