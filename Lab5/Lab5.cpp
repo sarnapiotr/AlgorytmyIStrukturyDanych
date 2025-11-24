@@ -5,6 +5,7 @@ private:
 	int* items;
 	int capacity;
 	int top;
+
 public:
 	ArrayStack(int c) {
 		items = new int[c];
@@ -40,6 +41,7 @@ public:
 	}
 
 	void clear() {
+		delete[] items;
 		top = -1;
 	}
 
@@ -163,20 +165,132 @@ public:
 
 	void enqueue(int x) {
 		if (!this->full()) {
-			if (this->tail < this->capacity) {
-
+			if(this->tail == capacity-1) {
+				this->tail = 0;
+				items[this->tail] = x;
+				this->size++;
 			}
 			else {
-
+				this->tail++;
+				items[this->tail] = x;
+				this->size++;
 			}
 		}
 	}
 
-	int peek();
-	void dequeue();
-	void clear();
-	friend std::ostream& operator<<(std::ostream& out, ArrayFifo& f);
-	~ArrayFifo();
+	int peek() {
+		return this->items[this->head];
+	}
+
+	void dequeue() {
+		if(!this->empty()) {
+			if(this->head == capacity-1) {
+				this->head = 0;
+				this->size--;
+			}
+			else {
+				this->head++;
+				this->size--;
+			}
+		}
+	}
+
+	void clear() {
+		delete[] items;
+		size = 0;
+		head = 0;
+		tail = 0;
+	}
+
+	friend std::ostream& operator<<(std::ostream& out, ArrayFifo& f) {
+		if(f.empty()) {
+			return out;
+		}
+		else {
+			int index = f.head;
+			for(int i = 0; i < f.size; i++) {
+				out << f.items[index] << " ";
+				if(index == f.capacity-1) {
+					index = 0;
+				}
+				else {
+					index++;
+				}
+			}
+			return out;
+		}
+	}
+
+	~ArrayFifo() {
+		this->clear();
+	}
+};
+
+class LinkedFifo {
+private:
+	Element* head;
+	Element* tail;
+public:
+	LinkedFifo() {
+		this->head = nullptr;
+		this->tail = nullptr;
+	}
+
+	bool empty() {
+		if (this->head == nullptr) return true;
+		return false;
+	}
+
+	void enqueue(int x) {
+		Element* element = new Element(x, nullptr);
+
+		if (this->empty()) {
+			this->head = element;
+			this->tail = element;
+		}
+		else {
+			this->tail->setNext(element);
+			this->tail = element;
+		}
+	}
+
+	int peek() {
+		if(!this->empty()) {
+			return this->head->getValue();
+		}
+	}
+
+	void dequeue() {
+		if (!this->empty()) {
+			Element* tempElement = this->head;
+			this->head = tempElement->getNext();
+			tempElement->setNext(nullptr);
+		}
+	}
+
+	void clear() {
+		while (this->head != nullptr) {
+			this->dequeue();
+		}
+	}
+
+	friend std::ostream& operator<<(std::ostream& out, LinkedFifo& f) {
+		if (f.empty()) {
+			return out;
+		}
+		else {
+			Element* tempNode = f.head;
+			while (tempNode != nullptr) {
+				out << tempNode->getValue() << " ";
+				tempNode = tempNode->getNext();
+			}
+			return out;
+		}
+	}
+
+	~LinkedFifo() {
+		this->clear();
+	}
 };
 
 int main()
